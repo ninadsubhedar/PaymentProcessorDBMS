@@ -1,0 +1,1017 @@
+CREATE DATABASE  IF NOT EXISTS `paymentprocessor` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */;
+USE `paymentprocessor`;
+-- MySQL dump 10.13  Distrib 8.0.12, for Win64 (x86_64)
+--
+-- Host: localhost    Database: paymentprocessor
+-- ------------------------------------------------------
+-- Server version	8.0.12
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+ SET NAMES utf8 ;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `accounts`
+--
+
+DROP TABLE IF EXISTS `accounts`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+ SET character_set_client = utf8mb4 ;
+CREATE TABLE `accounts` (
+  `AccountId` varchar(10) NOT NULL,
+  `Balance` double NOT NULL DEFAULT '0',
+  `fk_accType` varchar(36) NOT NULL,
+  `fk_CustId` varchar(20) NOT NULL,
+  PRIMARY KEY (`AccountId`),
+  KEY `fk_accounts_accounttype1_idx` (`fk_accType`),
+  KEY `fk_accounts_customer1_idx` (`fk_CustId`),
+  CONSTRAINT `fk_accounts_accounttype1` FOREIGN KEY (`fk_accType`) REFERENCES `accounttype` (`typeid`),
+  CONSTRAINT `fk_accounts_customer1` FOREIGN KEY (`fk_CustId`) REFERENCES `customer` (`customerid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `accounts`
+--
+
+LOCK TABLES `accounts` WRITE;
+/*!40000 ALTER TABLE `accounts` DISABLE KEYS */;
+INSERT INTO `accounts` VALUES ('1074653213',200,'2','5626063175'),('2450081011',500,'2','2407686541'),('7702957501',900,'1','2407686541');
+/*!40000 ALTER TABLE `accounts` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `accounttype`
+--
+
+DROP TABLE IF EXISTS `accounttype`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+ SET character_set_client = utf8mb4 ;
+CREATE TABLE `accounttype` (
+  `typeID` varchar(36) NOT NULL,
+  `Description` varchar(45) NOT NULL,
+  PRIMARY KEY (`typeID`),
+  UNIQUE KEY `Description_UNIQUE` (`Description`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `accounttype`
+--
+
+LOCK TABLES `accounttype` WRITE;
+/*!40000 ALTER TABLE `accounttype` DISABLE KEYS */;
+INSERT INTO `accounttype` VALUES ('2','CURRENT'),('1','SAVINGS');
+/*!40000 ALTER TABLE `accounttype` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `address`
+--
+
+DROP TABLE IF EXISTS `address`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+ SET character_set_client = utf8mb4 ;
+CREATE TABLE `address` (
+  `AddressID` varchar(36) NOT NULL,
+  `Street` varchar(45) NOT NULL,
+  `City` varchar(45) NOT NULL,
+  `State` varchar(45) NOT NULL,
+  `Zipcode` varchar(45) NOT NULL,
+  `fk_custId` varchar(20) NOT NULL,
+  PRIMARY KEY (`AddressID`),
+  KEY `fk_address_customer1_idx` (`fk_custId`),
+  CONSTRAINT `fk_address_customer1` FOREIGN KEY (`fk_custId`) REFERENCES `customer` (`customerid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `address`
+--
+
+LOCK TABLES `address` WRITE;
+/*!40000 ALTER TABLE `address` DISABLE KEYS */;
+INSERT INTO `address` VALUES ('2b6f64bd-fcf1-11e8-a4a8-0a0027000013','Huntington Ave.','Boston','MA','02115','2407686541'),('2b6fe43d-fcf1-11e8-a4a8-0a0027000013','Boylston Street','Boston','MA','02111','2407686541'),('2b6fe63d-fcf1-11e8-a4a8-0a0027000013','Park Drive','Boston','MA','02114','5626063175'),('2b6fe74e-fcf1-11e8-a4a8-0a0027000013','Mass Ave','Boston','MA','02115','5834254424'),('2b6fe81f-fcf1-11e8-a4a8-0a0027000013','Columbus Ave.','Boston','MA','02120','3724855865');
+/*!40000 ALTER TABLE `address` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `auditlog`
+--
+
+DROP TABLE IF EXISTS `auditlog`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+ SET character_set_client = utf8mb4 ;
+CREATE TABLE `auditlog` (
+  `AuditID` varchar(36) NOT NULL,
+  `DateUpdated` datetime NOT NULL,
+  `fk_payID` varchar(36) NOT NULL,
+  `status_StatusID` int(11) NOT NULL,
+  PRIMARY KEY (`AuditID`,`DateUpdated`),
+  KEY `fk_AuditLog_Payment1_idx` (`fk_payID`),
+  KEY `fk_auditlog_status1_idx` (`status_StatusID`),
+  CONSTRAINT `fk_AuditLog_Payment1` FOREIGN KEY (`fk_payID`) REFERENCES `paymessage` (`messageid`),
+  CONSTRAINT `fk_auditlog_status1` FOREIGN KEY (`status_StatusID`) REFERENCES `status` (`statusid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `auditlog`
+--
+
+LOCK TABLES `auditlog` WRITE;
+/*!40000 ALTER TABLE `auditlog` DISABLE KEYS */;
+INSERT INTO `auditlog` VALUES ('264f58e1-fe3e-11e8-a4a8-0a0027000013','2018-12-12 13:45:48','264eeafb-fe3e-11e8-a4a8-0a0027000013',1),('264fbb48-fe3e-11e8-a4a8-0a0027000013','2018-12-12 13:45:48','264eeafb-fe3e-11e8-a4a8-0a0027000013',2),('37d0458b-fe3e-11e8-a4a8-0a0027000013','2018-12-12 13:46:17','264eeafb-fe3e-11e8-a4a8-0a0027000013',5),('47a2028b-fe3e-11e8-a4a8-0a0027000013','2018-12-12 13:46:44','47a19c14-fe3e-11e8-a4a8-0a0027000013',1),('47a21154-fe3e-11e8-a4a8-0a0027000013','2018-12-12 13:46:44','47a19c14-fe3e-11e8-a4a8-0a0027000013',2),('6acde29c-fe3d-11e8-a4a8-0a0027000013','2018-12-12 13:40:33','6acd730b-fe3d-11e8-a4a8-0a0027000013',1),('6acf1703-fe3d-11e8-a4a8-0a0027000013','2018-12-12 13:40:33','6acd730b-fe3d-11e8-a4a8-0a0027000013',5),('795ea7ad-fe3d-11e8-a4a8-0a0027000013','2018-12-12 13:40:58','795e38fa-fe3d-11e8-a4a8-0a0027000013',1),('795edcb5-fe3d-11e8-a4a8-0a0027000013','2018-12-12 13:40:58','795e38fa-fe3d-11e8-a4a8-0a0027000013',2),('7f7827bc-fe3e-11e8-a4a8-0a0027000013','2018-12-12 13:48:18','47a19c14-fe3e-11e8-a4a8-0a0027000013',5),('a89d6a1e-fe3d-11e8-a4a8-0a0027000013','2018-12-12 13:42:17','795e38fa-fe3d-11e8-a4a8-0a0027000013',3);
+/*!40000 ALTER TABLE `auditlog` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `bookkeeping`
+--
+
+DROP TABLE IF EXISTS `bookkeeping`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+ SET character_set_client = utf8mb4 ;
+CREATE TABLE `bookkeeping` (
+  `BookKeepingID` varchar(36) NOT NULL,
+  `Amount` double NOT NULL,
+  `CreditedOrDebted` char(1) NOT NULL,
+  `TransactionDate` datetime NOT NULL,
+  `fk_payId` varchar(36) DEFAULT NULL,
+  `fk_accId` varchar(10) NOT NULL,
+  `fk_toOrFromAccId` varchar(10) DEFAULT NULL,
+  PRIMARY KEY (`BookKeepingID`),
+  KEY `fk_bookkeeping_payment1_idx` (`fk_payId`),
+  KEY `fk_bookkeeping_accounts1_idx` (`fk_accId`),
+  KEY `fk_bookkeeping_accounts2_idx` (`fk_toOrFromAccId`),
+  CONSTRAINT `fk_bookkeeping_accounts1` FOREIGN KEY (`fk_accId`) REFERENCES `accounts` (`accountid`),
+  CONSTRAINT `fk_bookkeeping_accounts2` FOREIGN KEY (`fk_toOrFromAccId`) REFERENCES `accounts` (`accountid`),
+  CONSTRAINT `fk_bookkeeping_payment1` FOREIGN KEY (`fk_payId`) REFERENCES `payment` (`paymentid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `bookkeeping`
+--
+
+LOCK TABLES `bookkeeping` WRITE;
+/*!40000 ALTER TABLE `bookkeeping` DISABLE KEYS */;
+INSERT INTO `bookkeeping` VALUES ('a89dbcc0-fe3d-11e8-a4a8-0a0027000013',500,'D','2018-12-12 00:00:00','795ea5dc-fe3d-11e8-a4a8-0a0027000013','1074653213','7702957501'),('a89e5eaf-fe3d-11e8-a4a8-0a0027000013',500,'C','2018-12-12 00:00:00','795ea5dc-fe3d-11e8-a4a8-0a0027000013','7702957501','1074653213'),('c0a6fd18-fe38-11e8-a4a8-0a0027000013',100,'C','2018-12-12 00:00:00',NULL,'1074653213',NULL);
+/*!40000 ALTER TABLE `bookkeeping` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `contact`
+--
+
+DROP TABLE IF EXISTS `contact`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+ SET character_set_client = utf8mb4 ;
+CREATE TABLE `contact` (
+  `ContactID` varchar(36) NOT NULL,
+  `ContactNumber` varchar(10) NOT NULL,
+  `fk_custId` varchar(20) NOT NULL,
+  PRIMARY KEY (`ContactID`),
+  KEY `fk_contact_customer1_idx` (`fk_custId`),
+  CONSTRAINT `fk_contact_customer1` FOREIGN KEY (`fk_custId`) REFERENCES `customer` (`customerid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `contact`
+--
+
+LOCK TABLES `contact` WRITE;
+/*!40000 ALTER TABLE `contact` DISABLE KEYS */;
+INSERT INTO `contact` VALUES ('7b3e842b-fcf1-11e8-a4a8-0a0027000013','7654321348','2407686541'),('7b3eeb3c-fcf1-11e8-a4a8-0a0027000013','984756374','5626063175'),('7b3eed11-fcf1-11e8-a4a8-0a0027000013','763846592','5626063175'),('7b3eedd5-fcf1-11e8-a4a8-0a0027000013','9850864532','5834254424'),('7b3eeea6-fcf1-11e8-a4a8-0a0027000013','6186473520','3724855865');
+/*!40000 ALTER TABLE `contact` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `customer`
+--
+
+DROP TABLE IF EXISTS `customer`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+ SET character_set_client = utf8mb4 ;
+CREATE TABLE `customer` (
+  `CustomerID` varchar(20) NOT NULL,
+  `FirstName` varchar(45) NOT NULL,
+  `LastName` varchar(45) NOT NULL,
+  `EmailId` varchar(45) NOT NULL,
+  PRIMARY KEY (`CustomerID`),
+  KEY `customerName` (`FirstName`,`LastName`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `customer`
+--
+
+LOCK TABLES `customer` WRITE;
+/*!40000 ALTER TABLE `customer` DISABLE KEYS */;
+INSERT INTO `customer` VALUES ('2407686541','John','Doe','John.Doe@email.com'),('3724855865','Ned','Stark','ned.Stark@email.com'),('5626063175','Jane','Doe','jane.doe@email.com'),('5834254424','John','Snow','john.snow@email.com');
+/*!40000 ALTER TABLE `customer` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `holidayrule`
+--
+
+DROP TABLE IF EXISTS `holidayrule`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+ SET character_set_client = utf8mb4 ;
+CREATE TABLE `holidayrule` (
+  `RuleID` varchar(36) NOT NULL,
+  `Date` date NOT NULL,
+  PRIMARY KEY (`RuleID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `holidayrule`
+--
+
+LOCK TABLES `holidayrule` WRITE;
+/*!40000 ALTER TABLE `holidayrule` DISABLE KEYS */;
+INSERT INTO `holidayrule` VALUES ('935dba5b-fca3-11e8-a4a8-0a0027000013','2018-12-23');
+/*!40000 ALTER TABLE `holidayrule` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `minimumamtrule`
+--
+
+DROP TABLE IF EXISTS `minimumamtrule`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+ SET character_set_client = utf8mb4 ;
+CREATE TABLE `minimumamtrule` (
+  `RuleID` varchar(36) NOT NULL,
+  `Amount` double NOT NULL,
+  `fk_accId` varchar(10) NOT NULL,
+  PRIMARY KEY (`RuleID`),
+  KEY `fk_minimumamtrule_accounts1_idx` (`fk_accId`),
+  CONSTRAINT `fk_minimumamtrule_accounts1` FOREIGN KEY (`fk_accId`) REFERENCES `accounts` (`accountid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `minimumamtrule`
+--
+
+LOCK TABLES `minimumamtrule` WRITE;
+/*!40000 ALTER TABLE `minimumamtrule` DISABLE KEYS */;
+INSERT INTO `minimumamtrule` VALUES ('e9a296f3-fca3-11e8-a4a8-0a0027000013',100,'7702957501'),('f8b94f3a-fca3-11e8-a4a8-0a0027000013',200,'1074653213');
+/*!40000 ALTER TABLE `minimumamtrule` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `payment`
+--
+
+DROP TABLE IF EXISTS `payment`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+ SET character_set_client = utf8mb4 ;
+CREATE TABLE `payment` (
+  `paymentID` varchar(36) NOT NULL,
+  `Amount` double NOT NULL,
+  `PayDate` date NOT NULL,
+  `fk_payMsgID` varchar(36) NOT NULL,
+  `creditorAccId` varchar(10) NOT NULL,
+  `debtorAccId` varchar(10) NOT NULL,
+  `fk_payTypeId` int(11) NOT NULL,
+  `fk_statusId` int(11) NOT NULL,
+  PRIMARY KEY (`paymentID`),
+  KEY `fk_payment_paymessage1_idx` (`fk_payMsgID`),
+  KEY `fk_payment_accounts1_idx` (`creditorAccId`),
+  KEY `fk_payment_accounts2_idx` (`debtorAccId`),
+  KEY `fk_payment_paymenttype1_idx` (`fk_payTypeId`),
+  KEY `fk_payment_status1_idx` (`fk_statusId`),
+  CONSTRAINT `fk_payment_accounts1` FOREIGN KEY (`creditorAccId`) REFERENCES `accounts` (`accountid`),
+  CONSTRAINT `fk_payment_accounts2` FOREIGN KEY (`debtorAccId`) REFERENCES `accounts` (`accountid`),
+  CONSTRAINT `fk_payment_paymenttype1` FOREIGN KEY (`fk_payTypeId`) REFERENCES `paymenttype` (`typeid`),
+  CONSTRAINT `fk_payment_paymessage1` FOREIGN KEY (`fk_payMsgID`) REFERENCES `paymessage` (`messageid`),
+  CONSTRAINT `fk_payment_status1` FOREIGN KEY (`fk_statusId`) REFERENCES `status` (`statusid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `payment`
+--
+
+LOCK TABLES `payment` WRITE;
+/*!40000 ALTER TABLE `payment` DISABLE KEYS */;
+INSERT INTO `payment` VALUES ('264f5715-fe3e-11e8-a4a8-0a0027000013',500,'2018-12-12','264eeafb-fe3e-11e8-a4a8-0a0027000013','7702957501','1074653213',1,5),('47a2014b-fe3e-11e8-a4a8-0a0027000013',100,'2018-12-12','47a19c14-fe3e-11e8-a4a8-0a0027000013','7702957501','1074653213',1,5),('6acddfad-fe3d-11e8-a4a8-0a0027000013',500,'2018-12-10','6acd730b-fe3d-11e8-a4a8-0a0027000013','7702957501','1074653213',1,5),('795ea5dc-fe3d-11e8-a4a8-0a0027000013',500,'2018-12-12','795e38fa-fe3d-11e8-a4a8-0a0027000013','7702957501','1074653213',1,3);
+/*!40000 ALTER TABLE `payment` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `validatePayment` BEFORE INSERT ON `payment` FOR EACH ROW valPay:BEGIN
+
+INSERT into auditlog values(uuid(),now(),NEW.fk_payMsgID,NEW.fk_statusId);
+
+-- validate back dated payments
+if new.paydate < curdate() then
+SET NEW.fk_statusId = 5;
+insert into rejectedpayment set rejectedpayment.fk_payMsgId = new.fk_payMsgID, fk_rejId = 4;
+leave `valPay`;
+end if;
+
+-- validate for holiday
+Set @holidayCount = 0;
+select count(*) into @holidayCount from holidayrule where `date` = NEW.PayDate;
+if @holidayCount = 1 then
+SET NEW.fk_statusId = 5;
+insert into rejectedpayment set rejectedpayment.fk_payMsgId = new.fk_payMsgID, fk_rejId = 5;
+leave `valPay`;
+end if;
+
+-- validate future dated
+if NEW.PayDate > curdate() then
+SET NEW.fk_statusId = 4;
+leave `valPay`;
+end if;
+
+SET NEW.fk_statusId = 2;
+END */;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `afterValidatePay` AFTER INSERT ON `payment` FOR EACH ROW BEGIN
+INSERT into auditlog values(uuid(),now(),NEW.fk_payMsgID,NEW.fk_statusId);
+END */;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `payment_AFTER_UPDATE` AFTER UPDATE ON `payment` FOR EACH ROW BEGIN
+if NEW.fk_statusId <> OLD.fk_statusId then
+INSERT into auditlog values(uuid(),now(),NEW.fk_payMsgID,NEW.fk_statusId);
+end if;
+END */;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+
+--
+-- Table structure for table `paymenttype`
+--
+
+DROP TABLE IF EXISTS `paymenttype`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+ SET character_set_client = utf8mb4 ;
+CREATE TABLE `paymenttype` (
+  `TypeID` int(11) NOT NULL,
+  `TypeName` varchar(45) NOT NULL,
+  PRIMARY KEY (`TypeID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `paymenttype`
+--
+
+LOCK TABLES `paymenttype` WRITE;
+/*!40000 ALTER TABLE `paymenttype` DISABLE KEYS */;
+INSERT INTO `paymenttype` VALUES (1,'DIRECT'),(2,'CHECK');
+/*!40000 ALTER TABLE `paymenttype` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `paymessage`
+--
+
+DROP TABLE IF EXISTS `paymessage`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+ SET character_set_client = utf8mb4 ;
+CREATE TABLE `paymessage` (
+  `messageID` varchar(36) NOT NULL,
+  `message` text NOT NULL,
+  `DateRecived` datetime NOT NULL,
+  PRIMARY KEY (`messageID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `paymessage`
+--
+
+LOCK TABLES `paymessage` WRITE;
+/*!40000 ALTER TABLE `paymessage` DISABLE KEYS */;
+INSERT INTO `paymessage` VALUES ('264eeafb-fe3e-11e8-a4a8-0a0027000013','<message><type>1</type><creditor>7702957501</creditor><debtor>1074653213</debtor><amount>500</amount><paydate>12122018</paydate></message>','2018-12-12 13:45:48'),('47a19c14-fe3e-11e8-a4a8-0a0027000013','<message><type>1</type><creditor>7702957501</creditor><debtor>1074653213</debtor><amount>100</amount><paydate>12122018</paydate></message>','2018-12-12 13:46:44'),('6acd730b-fe3d-11e8-a4a8-0a0027000013','<message><type>1</type><creditor>7702957501</creditor><debtor>1074653213</debtor><amount>500</amount><paydate>12102018</paydate></message>','2018-12-12 13:40:33'),('795e38fa-fe3d-11e8-a4a8-0a0027000013','<message><type>1</type><creditor>7702957501</creditor><debtor>1074653213</debtor><amount>500</amount><paydate>12122018</paydate></message>','2018-12-12 13:40:58');
+/*!40000 ALTER TABLE `paymessage` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `createPayment` AFTER INSERT ON `paymessage` FOR EACH ROW BEGIN
+set @payType = ExtractValue(NEW.message,'/message/type');
+set @payCreditor = ExtractValue(NEW.message,'/message/creditor');
+set @payDebtor = ExtractValue(NEW.message,'/message/debtor');
+set @payAmount = ExtractValue(NEW.message,'/message/amount');
+set @payDate = ExtractValue(NEW.message,'/message/paydate');
+
+insert into paymentprocessor.payment 
+set 
+paymentId = UUID(),
+Amount =  @payAmount,
+creditorAccId = @payCreditor,
+debtorAccId = @payDebtor,
+fk_payTypeId = @payType,
+fk_statusId = 1,
+PayDate = str_to_date(@paydate,'%m%d%Y'),
+fk_payMsgID = New.messageId;
+
+END */;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+
+--
+-- Table structure for table `rejectcode`
+--
+
+DROP TABLE IF EXISTS `rejectcode`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+ SET character_set_client = utf8mb4 ;
+CREATE TABLE `rejectcode` (
+  `rejectId` int(11) NOT NULL,
+  `Description` varchar(45) NOT NULL,
+  PRIMARY KEY (`rejectId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `rejectcode`
+--
+
+LOCK TABLES `rejectcode` WRITE;
+/*!40000 ALTER TABLE `rejectcode` DISABLE KEYS */;
+INSERT INTO `rejectcode` VALUES (1,'Insufficient balance'),(2,'Amount Exceeding allowed limit'),(3,'Amount putting balance below allowed limit'),(4,'Back dated payment'),(5,'Payment Cannot be processed On Holiday');
+/*!40000 ALTER TABLE `rejectcode` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `rejectedpayment`
+--
+
+DROP TABLE IF EXISTS `rejectedpayment`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+ SET character_set_client = utf8mb4 ;
+CREATE TABLE `rejectedpayment` (
+  `fk_payMsgId` varchar(36) NOT NULL,
+  `fk_rejId` int(11) NOT NULL,
+  PRIMARY KEY (`fk_payMsgId`,`fk_rejId`),
+  KEY `fk_rejectedpayment_paymessage1_idx` (`fk_payMsgId`),
+  KEY `fk_rejectedpayment_rejectCode1_idx` (`fk_rejId`),
+  CONSTRAINT `fk_rejectedpayment_paymessage1` FOREIGN KEY (`fk_payMsgId`) REFERENCES `paymessage` (`messageid`),
+  CONSTRAINT `fk_rejectedpayment_rejectCode1` FOREIGN KEY (`fk_rejId`) REFERENCES `rejectcode` (`rejectid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `rejectedpayment`
+--
+
+LOCK TABLES `rejectedpayment` WRITE;
+/*!40000 ALTER TABLE `rejectedpayment` DISABLE KEYS */;
+INSERT INTO `rejectedpayment` VALUES ('264eeafb-fe3e-11e8-a4a8-0a0027000013',1),('47a19c14-fe3e-11e8-a4a8-0a0027000013',3),('6acd730b-fe3d-11e8-a4a8-0a0027000013',4);
+/*!40000 ALTER TABLE `rejectedpayment` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `status`
+--
+
+DROP TABLE IF EXISTS `status`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+ SET character_set_client = utf8mb4 ;
+CREATE TABLE `status` (
+  `StatusID` int(11) NOT NULL,
+  `Type` varchar(45) NOT NULL,
+  PRIMARY KEY (`StatusID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `status`
+--
+
+LOCK TABLES `status` WRITE;
+/*!40000 ALTER TABLE `status` DISABLE KEYS */;
+INSERT INTO `status` VALUES (1,'RECIEVED'),(2,'PROCESSING'),(3,'COMPLETED'),(4,'HOLD'),(5,'REJECTED');
+/*!40000 ALTER TABLE `status` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Temporary view structure for view `viewcustomeraccountbalance`
+--
+
+DROP TABLE IF EXISTS `viewcustomeraccountbalance`;
+/*!50001 DROP VIEW IF EXISTS `viewcustomeraccountbalance`*/;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8mb4;
+/*!50001 CREATE VIEW `viewcustomeraccountbalance` AS SELECT 
+ 1 AS `Customer ID`,
+ 1 AS `Customer`,
+ 1 AS `Total Balance`*/;
+SET character_set_client = @saved_cs_client;
+
+--
+-- Temporary view structure for view `viewcustomeraddress`
+--
+
+DROP TABLE IF EXISTS `viewcustomeraddress`;
+/*!50001 DROP VIEW IF EXISTS `viewcustomeraddress`*/;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8mb4;
+/*!50001 CREATE VIEW `viewcustomeraddress` AS SELECT 
+ 1 AS `Customer`,
+ 1 AS `Address`*/;
+SET character_set_client = @saved_cs_client;
+
+--
+-- Temporary view structure for view `viewcustomercontact`
+--
+
+DROP TABLE IF EXISTS `viewcustomercontact`;
+/*!50001 DROP VIEW IF EXISTS `viewcustomercontact`*/;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8mb4;
+/*!50001 CREATE VIEW `viewcustomercontact` AS SELECT 
+ 1 AS `Customer`,
+ 1 AS `Contact Number`*/;
+SET character_set_client = @saved_cs_client;
+
+--
+-- Temporary view structure for view `viewcustomertransactions`
+--
+
+DROP TABLE IF EXISTS `viewcustomertransactions`;
+/*!50001 DROP VIEW IF EXISTS `viewcustomertransactions`*/;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8mb4;
+/*!50001 CREATE VIEW `viewcustomertransactions` AS SELECT 
+ 1 AS `Transaction ID`,
+ 1 AS `Transaction Date`,
+ 1 AS `Account Number`,
+ 1 AS `Account Type`,
+ 1 AS `Customer`,
+ 1 AS `Transaction Entity`,
+ 1 AS `Credited Or Debited`,
+ 1 AS `Amount`*/;
+SET character_set_client = @saved_cs_client;
+
+--
+-- Temporary view structure for view `viewpaymentlog`
+--
+
+DROP TABLE IF EXISTS `viewpaymentlog`;
+/*!50001 DROP VIEW IF EXISTS `viewpaymentlog`*/;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8mb4;
+/*!50001 CREATE VIEW `viewpaymentlog` AS SELECT 
+ 1 AS `Date Updated`,
+ 1 AS `Transaction ID`,
+ 1 AS `Payment ID`,
+ 1 AS `Status`*/;
+SET character_set_client = @saved_cs_client;
+
+--
+-- Temporary view structure for view `viewpayments`
+--
+
+DROP TABLE IF EXISTS `viewpayments`;
+/*!50001 DROP VIEW IF EXISTS `viewpayments`*/;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8mb4;
+/*!50001 CREATE VIEW `viewpayments` AS SELECT 
+ 1 AS `Payment ID`,
+ 1 AS `status`,
+ 1 AS `creditor`,
+ 1 AS `debtor`,
+ 1 AS `amount`,
+ 1 AS `payment type`,
+ 1 AS `payment date`,
+ 1 AS `Rejection Reason`*/;
+SET character_set_client = @saved_cs_client;
+
+--
+-- Temporary view structure for view `viewreadypayments`
+--
+
+DROP TABLE IF EXISTS `viewreadypayments`;
+/*!50001 DROP VIEW IF EXISTS `viewreadypayments`*/;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8mb4;
+/*!50001 CREATE VIEW `viewreadypayments` AS SELECT 
+ 1 AS `paymentId`,
+ 1 AS `amount`,
+ 1 AS `creditor`,
+ 1 AS `debtor`,
+ 1 AS `paydate`,
+ 1 AS `payMsgId`,
+ 1 AS `daterecived`*/;
+SET character_set_client = @saved_cs_client;
+
+--
+-- Dumping events for database 'paymentprocessor'
+--
+/*!50106 SET @save_time_zone= @@TIME_ZONE */ ;
+/*!50106 DROP EVENT IF EXISTS `procOnHoldPayment` */;
+DELIMITER ;;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;;
+/*!50003 SET character_set_client  = utf8mb4 */ ;;
+/*!50003 SET character_set_results = utf8mb4 */ ;;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_ENGINE_SUBSTITUTION' */ ;;
+/*!50003 SET @saved_time_zone      = @@time_zone */ ;;
+/*!50003 SET time_zone             = 'SYSTEM' */ ;;
+/*!50106 CREATE*/ /*!50117 DEFINER=`root`@`localhost`*/ /*!50106 EVENT `procOnHoldPayment` ON SCHEDULE EVERY 1 DAY STARTS '2018-12-12 15:07:40' ON COMPLETION NOT PRESERVE ENABLE DO begin
+call checkForHoldPayemnts();
+end */ ;;
+/*!50003 SET time_zone             = @saved_time_zone */ ;;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;;
+/*!50003 SET character_set_results = @saved_cs_results */ ;;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;;
+/*!50106 DROP EVENT IF EXISTS `procPayment` */;;
+DELIMITER ;;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;;
+/*!50003 SET character_set_client  = utf8mb4 */ ;;
+/*!50003 SET character_set_results = utf8mb4 */ ;;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_ENGINE_SUBSTITUTION' */ ;;
+/*!50003 SET @saved_time_zone      = @@time_zone */ ;;
+/*!50003 SET time_zone             = 'SYSTEM' */ ;;
+/*!50106 CREATE*/ /*!50117 DEFINER=`root`@`localhost`*/ /*!50106 EVENT `procPayment` ON SCHEDULE EVERY 2 MINUTE STARTS '2018-12-10 18:10:17' ON COMPLETION NOT PRESERVE ENABLE DO begin
+call processReadyPayments();
+end */ ;;
+/*!50003 SET time_zone             = @saved_time_zone */ ;;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;;
+/*!50003 SET character_set_results = @saved_cs_results */ ;;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;;
+DELIMITER ;
+/*!50106 SET TIME_ZONE= @save_time_zone */ ;
+
+--
+-- Dumping routines for database 'paymentprocessor'
+--
+/*!50003 DROP PROCEDURE IF EXISTS `checkForHoldPayemnts` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `checkForHoldPayemnts`()
+BEGIN
+update payment set `fk_statusId` = 2  where `fk_statusId` = 4 and PayDate = curdate();
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `createMessage` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `createMessage`(IN msg TEXT)
+begin
+insert into paymessage set 
+messageID = UUID(),
+message = msg,
+DateRecived = now();
+end ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `loadAmountToAccount` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `loadAmountToAccount`(IN amount double,IN accountNumber VARCHAR(10))
+BEGIN
+set transaction isolation level serializable;
+start transaction;
+update accounts set balance = balance + amount where AccountId = accountNumber;
+
+insert into bookkeeping set
+BookKeepingID = UUID(),
+Amount = amount,
+CreditedOrDebted = 'C',
+fk_accId = accountNumber,
+fk_toOrFromAccId = null,
+TransactionDate = curdate(),
+fk_payId = null;
+
+commit;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `processReadyPayments` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `processReadyPayments`()
+BEGIN
+DECLARE done INT DEFAULT FALSE;
+DECLARE payId,msgId VARCHAR(36);
+DECLARE cred, debt VARCHAR(10);
+DECLARE amt DOUBLE;
+DECLARE payDate DATE;
+DECLARE cur CURSOR FOR SELECT paymentId, payMsgId, amount, creditor, debtor,payDate FROM viewreadypayments;
+DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
+
+open cur;
+
+read_loop: loop
+fetch cur into payId, msgId, amt, cred,debt,payDate;
+IF done THEN
+  LEAVE read_loop;
+END IF;
+
+SET session transaction isolation level serializable;
+start transaction;
+
+-- validate the balance
+set @valCheck = 1;
+
+set @bal = 0;
+select balance into @bal from accounts where AccountId = debt;
+if @bal < amt then
+update payment set fk_statusId = 5 where paymentID = payId;
+insert into rejectedpayment set rejectedpayment.fk_payMsgID = msgId, fk_rejId = 1;
+set @valCheck = 0;
+end if;
+
+if @valCheck = 1 then
+set @lowLimit = 0;
+select Amount into @lowLimit from minimumamtrule where fk_AccId = debt;
+set @bal = 0;
+select balance into @bal from accounts where AccountId = debt;
+
+if @bal - amt < @lowLimit and @lowLimit != 0 then
+update payment set fk_statusId = 5 where paymentID = payId;
+insert into rejectedpayment set rejectedpayment.fk_payMsgID = msgId, fk_rejId = 3;
+set @valCheck = 0;
+end if;
+end if;
+
+
+
+if @valCheck = 1 then
+update accounts set balance = balance - amt where AccountId = debt;
+update accounts set balance = balance + amt where AccountId = cred;
+update payment set fk_statusId = 3 where paymentID = payId;
+
+
+insert into bookkeeping set
+BookKeepingID = UUID(),
+Amount = amt,
+CreditedOrDebted = 'D',
+fk_accId = debt,
+fk_toOrFromAccId = cred,
+TransactionDate = curdate(),
+fk_payId = payID;
+
+
+insert into bookkeeping set
+BookKeepingID = UUID(),
+Amount = amt,
+CreditedOrDebted = 'C',
+fk_accId = cred,
+fk_toOrFromAccId = debt,
+TransactionDate = curdate(),
+fk_payId = payID;
+
+end if;
+
+commit;
+
+end loop read_loop;
+close cur;
+
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+
+--
+-- Final view structure for view `viewcustomeraccountbalance`
+--
+
+/*!50001 DROP VIEW IF EXISTS `viewcustomeraccountbalance`*/;
+/*!50001 SET @saved_cs_client          = @@character_set_client */;
+/*!50001 SET @saved_cs_results         = @@character_set_results */;
+/*!50001 SET @saved_col_connection     = @@collation_connection */;
+/*!50001 SET character_set_client      = utf8mb4 */;
+/*!50001 SET character_set_results     = utf8mb4 */;
+/*!50001 SET collation_connection      = utf8mb4_0900_ai_ci */;
+/*!50001 CREATE ALGORITHM=UNDEFINED */
+/*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
+/*!50001 VIEW `viewcustomeraccountbalance` AS select `customer`.`CustomerID` AS `Customer ID`,concat_ws(' ',`customer`.`FirstName`,`customer`.`LastName`) AS `Customer`,sum(`accounts`.`Balance`) AS `Total Balance` from ((`customer` join `accounts` on((`customer`.`CustomerID` = `accounts`.`fk_CustId`))) join `accounttype` on((`accounts`.`fk_accType` = `accounttype`.`typeID`))) group by `customer`.`CustomerID` order by `customer`.`CustomerID` */;
+/*!50001 SET character_set_client      = @saved_cs_client */;
+/*!50001 SET character_set_results     = @saved_cs_results */;
+/*!50001 SET collation_connection      = @saved_col_connection */;
+
+--
+-- Final view structure for view `viewcustomeraddress`
+--
+
+/*!50001 DROP VIEW IF EXISTS `viewcustomeraddress`*/;
+/*!50001 SET @saved_cs_client          = @@character_set_client */;
+/*!50001 SET @saved_cs_results         = @@character_set_results */;
+/*!50001 SET @saved_col_connection     = @@collation_connection */;
+/*!50001 SET character_set_client      = utf8mb4 */;
+/*!50001 SET character_set_results     = utf8mb4 */;
+/*!50001 SET collation_connection      = utf8mb4_0900_ai_ci */;
+/*!50001 CREATE ALGORITHM=UNDEFINED */
+/*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
+/*!50001 VIEW `viewcustomeraddress` AS select concat_ws(' ',`cust`.`FirstName`,`cust`.`LastName`) AS `Customer`,concat_ws(', ',`addr`.`Street`,`addr`.`City`,`addr`.`State`,`addr`.`Zipcode`) AS `Address` from (`customer` `cust` join `address` `addr` on((`addr`.`fk_custId` = `cust`.`CustomerID`))) */;
+/*!50001 SET character_set_client      = @saved_cs_client */;
+/*!50001 SET character_set_results     = @saved_cs_results */;
+/*!50001 SET collation_connection      = @saved_col_connection */;
+
+--
+-- Final view structure for view `viewcustomercontact`
+--
+
+/*!50001 DROP VIEW IF EXISTS `viewcustomercontact`*/;
+/*!50001 SET @saved_cs_client          = @@character_set_client */;
+/*!50001 SET @saved_cs_results         = @@character_set_results */;
+/*!50001 SET @saved_col_connection     = @@collation_connection */;
+/*!50001 SET character_set_client      = utf8mb4 */;
+/*!50001 SET character_set_results     = utf8mb4 */;
+/*!50001 SET collation_connection      = utf8mb4_0900_ai_ci */;
+/*!50001 CREATE ALGORITHM=UNDEFINED */
+/*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
+/*!50001 VIEW `viewcustomercontact` AS select concat_ws(' ',`cust`.`FirstName`,`cust`.`LastName`) AS `Customer`,`cont`.`ContactNumber` AS `Contact Number` from (`customer` `cust` join `contact` `cont` on((`cont`.`fk_custId` = `cust`.`CustomerID`))) */;
+/*!50001 SET character_set_client      = @saved_cs_client */;
+/*!50001 SET character_set_results     = @saved_cs_results */;
+/*!50001 SET collation_connection      = @saved_col_connection */;
+
+--
+-- Final view structure for view `viewcustomertransactions`
+--
+
+/*!50001 DROP VIEW IF EXISTS `viewcustomertransactions`*/;
+/*!50001 SET @saved_cs_client          = @@character_set_client */;
+/*!50001 SET @saved_cs_results         = @@character_set_results */;
+/*!50001 SET @saved_col_connection     = @@collation_connection */;
+/*!50001 SET character_set_client      = utf8mb4 */;
+/*!50001 SET character_set_results     = utf8mb4 */;
+/*!50001 SET collation_connection      = utf8mb4_0900_ai_ci */;
+/*!50001 CREATE ALGORITHM=UNDEFINED */
+/*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
+/*!50001 VIEW `viewcustomertransactions` AS select ifnull(`bkp`.`fk_payId`,'NA') AS `Transaction ID`,date_format(`bkp`.`TransactionDate`,'%m/%d/%Y') AS `Transaction Date`,`cred`.`AccountId` AS `Account Number`,`acctype`.`Description` AS `Account Type`,concat_ws(' ',`cust`.`FirstName`,`cust`.`LastName`) AS `Customer`,ifnull(concat(`othercust`.`FirstName`,' ',`othercust`.`LastName`),'SELF') AS `Transaction Entity`,if((`bkp`.`CreditedOrDebted` = 'C'),'Credited','Debited') AS `Credited Or Debited`,`bkp`.`Amount` AS `Amount` from (((((`bookkeeping` `bkp` join `accounts` `cred` on((`cred`.`AccountId` = `bkp`.`fk_accId`))) join `customer` `cust` on((`cust`.`CustomerID` = `cred`.`fk_CustId`))) left join `accounts` `othracc` on((`othracc`.`AccountId` = `bkp`.`fk_toOrFromAccId`))) left join `customer` `othercust` on((`othercust`.`CustomerID` = `othracc`.`fk_CustId`))) join `accounttype` `acctype` on((`acctype`.`typeID` = `cred`.`fk_accType`))) order by concat_ws(' ',`cust`.`FirstName`,`cust`.`LastName`),`cred`.`AccountId`,`bkp`.`TransactionDate` desc */;
+/*!50001 SET character_set_client      = @saved_cs_client */;
+/*!50001 SET character_set_results     = @saved_cs_results */;
+/*!50001 SET collation_connection      = @saved_col_connection */;
+
+--
+-- Final view structure for view `viewpaymentlog`
+--
+
+/*!50001 DROP VIEW IF EXISTS `viewpaymentlog`*/;
+/*!50001 SET @saved_cs_client          = @@character_set_client */;
+/*!50001 SET @saved_cs_results         = @@character_set_results */;
+/*!50001 SET @saved_col_connection     = @@collation_connection */;
+/*!50001 SET character_set_client      = utf8mb4 */;
+/*!50001 SET character_set_results     = utf8mb4 */;
+/*!50001 SET collation_connection      = utf8mb4_0900_ai_ci */;
+/*!50001 CREATE ALGORITHM=UNDEFINED */
+/*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
+/*!50001 VIEW `viewpaymentlog` AS select `auditlog`.`DateUpdated` AS `Date Updated`,`payment`.`paymentID` AS `Transaction ID`,`auditlog`.`fk_payID` AS `Payment ID`,`status`.`Type` AS `Status` from ((`auditlog` join `status` on((`status`.`StatusID` = `auditlog`.`status_StatusID`))) join `payment` on((`payment`.`fk_payMsgID` = `auditlog`.`fk_payID`))) order by `auditlog`.`DateUpdated` asc */;
+/*!50001 SET character_set_client      = @saved_cs_client */;
+/*!50001 SET character_set_results     = @saved_cs_results */;
+/*!50001 SET collation_connection      = @saved_col_connection */;
+
+--
+-- Final view structure for view `viewpayments`
+--
+
+/*!50001 DROP VIEW IF EXISTS `viewpayments`*/;
+/*!50001 SET @saved_cs_client          = @@character_set_client */;
+/*!50001 SET @saved_cs_results         = @@character_set_results */;
+/*!50001 SET @saved_col_connection     = @@collation_connection */;
+/*!50001 SET character_set_client      = utf8mb4 */;
+/*!50001 SET character_set_results     = utf8mb4 */;
+/*!50001 SET collation_connection      = utf8mb4_0900_ai_ci */;
+/*!50001 CREATE ALGORITHM=UNDEFINED */
+/*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
+/*!50001 VIEW `viewpayments` AS select `pay`.`paymentID` AS `Payment ID`,`stat`.`Type` AS `status`,concat_ws(' ',`cust_c`.`FirstName`,`cust_c`.`LastName`) AS `creditor`,concat_ws(' ',`cust_d`.`FirstName`,`cust_d`.`LastName`) AS `debtor`,`pay`.`Amount` AS `amount`,`paytype`.`TypeName` AS `payment type`,`pay`.`PayDate` AS `payment date`,`rejcode`.`Description` AS `Rejection Reason` from (((((((((`payment` `pay` join `paymessage` `paymsg` on((`pay`.`fk_payMsgID` = `paymsg`.`messageID`))) join `status` `stat` on((`stat`.`StatusID` = `pay`.`fk_statusId`))) join `accounts` `acc_c` on((`acc_c`.`AccountId` = `pay`.`creditorAccId`))) join `customer` `cust_c` on((`acc_c`.`fk_CustId` = `cust_c`.`CustomerID`))) join `accounts` `acc_d` on((`acc_d`.`AccountId` = `pay`.`debtorAccId`))) join `customer` `cust_d` on((`acc_d`.`fk_CustId` = `cust_d`.`CustomerID`))) join `paymenttype` `paytype` on((`paytype`.`TypeID` = `pay`.`fk_payTypeId`))) left join `rejectedpayment` `rejpay` on((`rejpay`.`fk_payMsgId` = `pay`.`fk_payMsgID`))) left join `rejectcode` `rejcode` on((`rejcode`.`rejectId` = `rejpay`.`fk_rejId`))) order by `paymsg`.`DateRecived` desc */;
+/*!50001 SET character_set_client      = @saved_cs_client */;
+/*!50001 SET character_set_results     = @saved_cs_results */;
+/*!50001 SET collation_connection      = @saved_col_connection */;
+
+--
+-- Final view structure for view `viewreadypayments`
+--
+
+/*!50001 DROP VIEW IF EXISTS `viewreadypayments`*/;
+/*!50001 SET @saved_cs_client          = @@character_set_client */;
+/*!50001 SET @saved_cs_results         = @@character_set_results */;
+/*!50001 SET @saved_col_connection     = @@collation_connection */;
+/*!50001 SET character_set_client      = utf8mb4 */;
+/*!50001 SET character_set_results     = utf8mb4 */;
+/*!50001 SET collation_connection      = utf8mb4_0900_ai_ci */;
+/*!50001 CREATE ALGORITHM=UNDEFINED */
+/*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
+/*!50001 VIEW `viewreadypayments` AS select `pay`.`paymentID` AS `paymentId`,`pay`.`Amount` AS `amount`,`pay`.`creditorAccId` AS `creditor`,`pay`.`debtorAccId` AS `debtor`,`pay`.`PayDate` AS `paydate`,`paymsg`.`messageID` AS `payMsgId`,`paymsg`.`DateRecived` AS `daterecived` from (`payment` `pay` join `paymessage` `paymsg` on((`pay`.`fk_payMsgID` = `paymsg`.`messageID`))) where (`pay`.`fk_statusId` = 2) order by `paymsg`.`DateRecived` asc */;
+/*!50001 SET character_set_client      = @saved_cs_client */;
+/*!50001 SET character_set_results     = @saved_cs_results */;
+/*!50001 SET collation_connection      = @saved_col_connection */;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2018-12-12 15:08:40
